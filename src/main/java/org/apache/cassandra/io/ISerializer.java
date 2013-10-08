@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -15,20 +15,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.cassandra.io;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public interface ICompactSerializer2<T>
+import org.apache.cassandra.db.TypeSizes;
+
+public interface ISerializer<T>
 {
-	/**
+    /**
      * Serialize the specified type into the specified DataOutput instance.
      * @param t type that needs to be serialized
      * @param dos DataOutput into which serialization needs to happen.
-     * @throws IOException
+     * @throws java.io.IOException
      */
     public void serialize(T t, DataOutput dos) throws IOException;
 
@@ -38,5 +39,7 @@ public interface ICompactSerializer2<T>
      * @throws IOException
      * @return the type that was deserialized
      */
-    public T deserialize(DataInput dis) throws IOException;    
+    public T deserialize(DataInput dis) throws IOException;
+
+    public long serializedSize(T t, TypeSizes type);
 }

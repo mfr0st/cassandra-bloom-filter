@@ -18,18 +18,17 @@
 */
 package org.apache.cassandra.utils;
 
+import org.apache.cassandra.io.util.DataOutputBuffer;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-
-import org.apache.cassandra.io.util.DataOutputBuffer;
-
-import org.junit.Before;
-import org.junit.Test;
 
 public class BloomFilterTest
 {
@@ -37,17 +36,17 @@ public class BloomFilterTest
 
     public BloomFilterTest()
     {
-        bf = BloomFilter.getFilter(10000L, FilterTestHelper.MAX_FAILURE_RATE);
+        bf = (BloomFilter) FilterFactory.getFilter(10000L, FilterTestHelper.MAX_FAILURE_RATE, true);
     }
 
     public static BloomFilter testSerialize(BloomFilter f) throws IOException
     {
         f.add(ByteBufferUtil.bytes("a"));
         DataOutputBuffer out = new DataOutputBuffer();
-        f.serializer().serialize(f, out);
+        Murmur3BloomFilter.serializer.serialize(f, out);
 
         ByteArrayInputStream in = new ByteArrayInputStream(out.getData(), 0, out.getLength());
-        BloomFilter f2 = f.serializer().deserialize(new DataInputStream(in));
+        BloomFilter f2 = Murmur3BloomFilter.serializer.deserialize(new DataInputStream(in));
 
         assert f2.isPresent(ByteBufferUtil.bytes("a"));
         assert !f2.isPresent(ByteBufferUtil.bytes("b"));
@@ -101,7 +100,7 @@ public class BloomFilterTest
         {
             return;
         }
-        BloomFilter bf2 = BloomFilter.getFilter(KeyGenerator.WordGenerator.WORDS / 2, FilterTestHelper.MAX_FAILURE_RATE);
+        BloomFilter bf2 = (BloomFilter) FilterFactory.getFilter(KeyGenerator.WordGenerator.WORDS / 2, FilterTestHelper.MAX_FAILURE_RATE, false);
         int skipEven = KeyGenerator.WordGenerator.WORDS % 2 == 0 ? 0 : 2;
         FilterTestHelper.testFalsePositives(bf2,
                                             new KeyGenerator.WordGenerator(skipEven, 2),
@@ -123,7 +122,7 @@ public class BloomFilterTest
         {
             hashes.clear();
             ByteBuffer buf = keys.next();
-            for (long hashIndex : BloomFilter.getHashBuckets(buf, MAX_HASH_COUNT, 1024 * 1024))
+            for (long hashIndex : bf.getHashBuckets(buf, MAX_HASH_COUNT, 1024 * 1024))
             {
                 hashes.add(hashIndex);
             }

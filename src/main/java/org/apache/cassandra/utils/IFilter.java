@@ -15,6 +15,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.cassandra.io.util;
+package org.apache.cassandra.utils;
 
-public interface FileMark {}
+import java.io.Closeable;
+import java.nio.ByteBuffer;
+
+public interface IFilter extends Closeable
+{
+    public abstract void add(ByteBuffer key);
+
+    public abstract boolean isPresent(ByteBuffer key);
+
+    public abstract void clear();
+}
