@@ -15,6 +15,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.cassandra.io.util;
+package org.apache.cassandra.utils.obs;
 
-public interface FileMark {}
+import java.io.Closeable;
+import java.io.DataOutput;
+import java.io.IOException;
+
+import org.apache.cassandra.db.TypeSizes;
+
+public interface IBitSet extends Closeable
+{
+    public long capacity();
+
+    /**
+     * Returns true or false for the specified bit index. The index should be
+     * less than the capacity.
+     */
+    public boolean get(long index);
+
+    /**
+     * Sets the bit at the specified index. The index should be less than the
+     * capacity.
+     */
+    public void set(long index);
+
+    /**
+     * clears the bit. The index should be less than the capacity.
+     */
+    public void clear(long index);
+
+    public void serialize(DataOutput dos) throws IOException;
+
+    public long serializedSize(TypeSizes type);
+
+    public void clear();
+}

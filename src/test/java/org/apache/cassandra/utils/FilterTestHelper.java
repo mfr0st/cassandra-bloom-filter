@@ -18,16 +18,7 @@
 */
 package org.apache.cassandra.utils;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
-import org.apache.cassandra.io.util.DataOutputBuffer;
-import org.junit.Test;
 
 public class FilterTestHelper
 {
@@ -52,7 +43,7 @@ public class FilterTestHelper
         return new KeyGenerator.RandomStringGenerator(271828, ELEMENTS);
     }
 
-    public static void testFalsePositives(Filter f, ResetableIterator<ByteBuffer> keys, ResetableIterator<ByteBuffer> otherkeys)
+    public static void testFalsePositives(IFilter f, ResetableIterator<ByteBuffer> keys, ResetableIterator<ByteBuffer> otherkeys)
     {
         assert keys.size() == otherkeys.size();
 
